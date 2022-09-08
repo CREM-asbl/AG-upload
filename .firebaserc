@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "apprenti-geometre"
+  },
+  "targets": {
+    "apprenti-geometre": {
+      "hosting": {
+        "default": [
+          "ag-upload"
+        ]
+      }
+    }
+  }
+}

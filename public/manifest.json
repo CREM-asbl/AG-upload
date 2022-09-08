@@ -1,0 +1,25 @@
+{
+  "name": "Upload fichiers Apprenti Géomètre mobile",
+  "short_name": "Upload AG mobile",
+  "version": "0.1",
+  "icons": [
+    {
+      "src": "images/manifest/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "images/manifest/maskable_icon2.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "fullscreen",
+  "theme_color": "lightgrey",
+  "background_color": "lightgrey",
+  "orientation": "landscape",
+  "description": "Upload de fichiers pour Apprenti Géomètre mobile"
+}

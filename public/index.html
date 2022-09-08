@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="google" content="notranslate">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Upload fichiers AG mobile</title>
+  <meta name="description" content="Outil d'upload de fichiers pour Apprenti Géomètre mobile">
+
+  <link rel="icon" href="/images/favicon.ico">
+
+  <!-- pwa data -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="lightgrey" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="lightgrey" media="(prefers-color-scheme: dark)">
+
+  <!-- Default Open graph -->
+  <meta property="og:title" content="Apprenti Géomètre mobile">
+  <meta property="og:url" content="https://ag-upload.crem.be">
+  <meta property="og:type" content="application">
+  <meta property="og:site_name" content="AG mobile">
+  <meta property="og:image" content="https://ag-beta.crem.be/images/manifest/icon-512.png">
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:description" content="Logiciel mobile de géométrie dynamique">
+<!--
+  <script type="module">
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        const sw = await navigator.serviceWorker.register('/service-worker.js')
+        sw.onupdatefound = () => {
+          sw.installing.onstatechange = () => {
+            if (sw.waiting) {
+              sw.waiting.postMessage({ type: "SKIP_WAITING" })
+            }
+          }
+        }
+      });
+
+      navigator.serviceWorker.oncontrollerchange = () => {
+        if (confirm(`Mise à jour disponible.\nMettre à jour ?`))
+          location.reload()
+      }
+    }
+  </script> -->
+
+  <style>
+    html,
+    body,
+    agu-app {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-y: hidden;
+    }
+
+    body {
+      --main-theme-color: rgb(110, 33, 243);
+      --button-hover-background-color: #a9f4f7;
+      --menu-shadow-color: #000;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <agu-app>
+
+  <script type="module" src="/dist/agu-app.js" crossorigin></script>
+
+  <noscript>
+    Veuillez activer javascript afin de profiter de cette application
+  </noscript>
+</body>
+
+</html>
