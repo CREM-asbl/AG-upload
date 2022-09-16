@@ -7,11 +7,13 @@ export class App {
   constructor() {
     this.user = null;
 
-    this.modules = [];
     this.themes = [];
+    this.modules = [];
+    this.files = [];
 
     this.fileEnvironmentToShow = 'Tous les environnements';
     this.fileModuleToShow = 'Tous les modules';
+    this.moduleThemeToShow = 'Tous les thèmes';
   }
 }
 
@@ -26,16 +28,23 @@ export const setState = (update) => {
     app[key] = value;
   }
   window.dispatchEvent(new CustomEvent('state-changed', { detail: app }));
+  if ('themes' in update) {
+    window.dispatchEvent(new CustomEvent('themes-changed', { detail: app }));
+  }
   if ('modules' in update) {
     window.dispatchEvent(new CustomEvent('modules-changed', { detail: app }));
   }
-  if ('themes' in update) {
-    window.dispatchEvent(new CustomEvent('themes-changed', { detail: app }));
+  if ('files' in update) {
+    window.dispatchEvent(new CustomEvent('files-changed', { detail: app }));
   }
   if ('fileEnvironmentToShow' in update) {
     window.dispatchEvent(new CustomEvent('fileEnvironmentToShow-changed', { detail: app }));
   }
   if ('fileModuleToShow' in update) {
     window.dispatchEvent(new CustomEvent('fileModuleToShow-changed', { detail: app }));
+  }
+  if ('moduleThemeToShow' in update) {
+    console.log(app);
+    window.dispatchEvent(new CustomEvent('moduleThemeToShow-changed', { detail: app }));
   }
 };

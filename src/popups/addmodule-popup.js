@@ -1,6 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { app } from '../Core/App';
-import { addModule } from '../Requests/moduleRequest';
+import { addModule, updateModules } from '../Requests/moduleRequest';
+import { updateThemes } from '../Requests/themeRequest';
 import { TemplatePopup } from './template-popup';
 
 class AddModulePopup extends LitElement {
@@ -13,10 +14,8 @@ class AddModulePopup extends LitElement {
   constructor() {
     super();
 
-    this.allThemes = [{ id: 'aucun' }, ...app.themes];
-    window.addEventListener('themes-changed', () => this.allThemes = [{ id: 'aucun' }, ...app.themes]);
-
-    console.log(this.allThemes);
+    this.allThemes = app.themes;
+    window.addEventListener('themes-changed', () => this.allThemes = app.themes);
 
     window.addEventListener('close-popup', () => this.close());
   }
@@ -63,6 +62,8 @@ class AddModulePopup extends LitElement {
   async sendModule() {
     if (this.moduleName && this.moduleName != "") {
       addModule(this.moduleName, this.themeName);
+      updateModules();
+      updateThemes();
     } else {
       alert("remplir le champ nom du module");
       return;

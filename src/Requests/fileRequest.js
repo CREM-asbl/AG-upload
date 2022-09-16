@@ -1,5 +1,5 @@
 import { arrayUnion, collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
-import { app } from "../Core/App";
+import { app, setState } from "../Core/App";
 import { handleMultipleDocumentRequest } from "./generalRequest";
 
 export async function findAllFiles() {
@@ -20,4 +20,9 @@ export function addFile(file, moduleName, fileContentObject) {
   updateDoc(moduleDocRef, {
     files: arrayUnion(newFileDocRef),
   });
+}
+
+export async function updateFiles() {
+  let files = await findAllFiles();
+  setState({ files });
 }

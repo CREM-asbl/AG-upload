@@ -2,11 +2,6 @@ import { arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from 
 import { app, setState } from "../Core/App";
 import { handleMultipleDocumentRequest, handleSingleDocumentRequest } from "./generalRequest";
 
-export async function findModuleByName(name) {
-  let moduleInfo = handleSingleDocumentRequest(() => getDoc(doc(app.db, "modules", name)));
-  return moduleInfo;
-}
-
 export async function findAllModules() {
   let modulesInfos = await handleMultipleDocumentRequest(() => getDocs(collection(app.db, "modules")));
   return modulesInfos;

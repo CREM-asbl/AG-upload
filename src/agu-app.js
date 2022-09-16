@@ -4,11 +4,13 @@ import { createElem } from './Core/general';
 import './file-list';
 import './Firebase/firebase-init';
 import './header-elem';
+import './module-list';
 import './popups/addfile-popup';
 import './popups/addmodule-popup';
 import './popups/addtheme-popup';
-import { findAllModules, updateModules } from './Requests/moduleRequest';
-import { findAllThemes, updateThemes } from './Requests/themeRequest';
+import { updateFiles } from './Requests/fileRequest';
+import { updateModules } from './Requests/moduleRequest';
+import { updateThemes } from './Requests/themeRequest';
 import './sign-in';
 import './theme-list';
 
@@ -25,6 +27,9 @@ class AguApp extends LitElement {
 
     this.allModules = [{ id: 'Tous les modules' }, ...app.modules];
     window.addEventListener('modules-changed', () => this.allModules = [{ id: 'Tous les modules' }, ...app.modules]);
+
+    this.allThemes = [{ id: 'Tous les thèmes' }, ...app.themes];
+    window.addEventListener('themes-changed', () => this.allThemes = [{ id: 'Tous les thèmes' }, ...app.themes]);
 
     this.allEnvironments = ['Tous les environnements', 'Grandeurs', 'Tangram', 'Cubes', 'Geometrie'];
 
@@ -61,105 +66,8 @@ class AguApp extends LitElement {
         box-shadow: inset 0px 0px 3px grey;
       }
 
-      #table-container {
-        height: calc(100% - 150px);
-        overflow: auto;
-        margin: auto;
-        // margin-top: 10px;
-      }
-
-      table
-      {
-        border-collapse: collapse;
-        // border: 1px solid #333;
-        margin: auto;
-        // margin-top: 10px;
-        // margin-bottom: 10px;
-        border-spacing: 0px;
-        width: 1400px;
-        max-width: 90%;
-        box-shadow: 0px 0px 5px grey;
-        // border-radius:  7px;
-      }
-
-      thead {
-        position: sticky;
-        top: 0px;
-        z-index: 10;
-      }
-
-      td, th {
-        border-collapse:collapse;
-        // border-right: solid 0.5px #333;
-        // border-left: solid 0.5px #333;
-        padding: 5px 20px;
-      }
-
-      tr {
-        background-color: #bbb;
-      }
-
-      img.table-item-image {
-        height: 1em;
-      }
-
-      [sorted="notSorted"] {
-        background:url(data:image/gif;base64,R0lGODlhCwALAJEAAAAAAP///xUVFf///yH5BAEAAAMALAAAAAALAAsAAAIUnC2nKLnT4or00PvyrQwrPzUZshQAOw==) no-repeat center right !important;
-      }
-
-      [sorted="ascending"] {
-        background:url(data:image/gif;base64,R0lGODlhCwALAJEAAAAAAP///xUVFf///yH5BAEAAAMALAAAAAALAAsAAAIRnC2nKLnT4or00Puy3rx7VQAAOw==) no-repeat center right !important;
-      }
-
-      [sorted="descending"] {
-        background:url(data:image/gif;base64,R0lGODlhCwALAJEAAAAAAP///xUVFf///yH5BAEAAAMALAAAAAALAAsAAAIPnI+py+0/hJzz0IruwjsVADs=) no-repeat center right !important;
-      }
-
-      .clipboardContainer {
-        float: right;
-        position: relative;
-        display: inline-block;
-      }
-
-      .clipboardContainer .clipboardTooltip {
-        visibility: hidden;
-        width: 140px;
-        background-color: #555;
-        color: #fff;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px;
-        position: absolute;
-        z-index: 11;
-        bottom: 150%;
-        left: 50%;
-        margin-left: -75px;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-
-      .clipboardContainer .clipboardTooltip::after {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        margin-left: -5px;
-        border-width: 5px;
-        border-style: solid;
-        border-color: #555 transparent transparent transparent;
-      }
-
-      .clipboardContainer:hover .clipboardTooltip {
-        visibility: visible;
-        opacity: 1;
-      }
-
-      a {
-        color: blue;
-      }
-
-      a:visited {
-        color: blue;
+      button {
+        cursor: pointer;
       }
     `
   }
@@ -172,9 +80,14 @@ class AguApp extends LitElement {
     setState({ fileModuleToShow: event.target.options[event.target.selectedIndex].value });
   }
 
+  changeThemeShown(event) {
+    setState({ moduleThemeToShow: event.target.options[event.target.selectedIndex].value });
+  }
+
   async firstUpdated() {
     updateThemes();
     updateModules();
+    updateFiles();
   }
 
   changeElementTypeToShow(e) {
@@ -228,6 +141,14 @@ class AguApp extends LitElement {
               <button @click="${this.openAddModulePopup}">
                 Ajouter un module
               </button>
+
+              Filtrer par
+
+              <br>
+
+              <select style="width:49%" name="themeToShow" id="themeToShow" @change="${this.changeThemeShown}">
+                ${this.allThemes.map(theme => html`<option value="${theme.id}">${theme.id}</option>`)}
+              </select>
             </fieldset>
             <fieldset class="element-choice ${this.elementTypeToShow == 'files' ? 'element-choice-selected' : ''}">
               <legend>Fichiers</legend>

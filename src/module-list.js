@@ -1,15 +1,17 @@
-import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
+import { arrayRemove, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { css, html, LitElement } from 'lit';
 import { app } from './Core/App';
 import { createElem } from './Core/general';
 import './Firebase/firebase-init';
-import './popups/modifytheme-popup';
+import './popups/modifymodule-popup';
+import { updateModules } from './Requests/moduleRequest';
 import { updateThemes } from './Requests/themeRequest';
 
-class ThemeList extends LitElement {
+class ModuleList extends LitElement {
   static get properties() {
     return {
-      themesDisplayed: { type: Array },
+      modulesDisplayed: { type: Array },
+      moduleThemeToShow: { type: String }
       // nameSorted: { type: String },
       // clipboardText: { type: String },
     };
@@ -17,8 +19,11 @@ class ThemeList extends LitElement {
 
   constructor() {
     super();
-    this.themesDisplayed = app.themes;
-    window.addEventListener('themes-changed', () => this.themesDisplayed = app.themes);
+    this.modulesDisplayed = app.modules;
+    window.addEventListener('modules-changed', () => this.modulesDisplayed = app.modules);
+
+    this.moduleThemeToShow = app.moduleThemeToShow;
+    window.addEventListener('moduleThemeToShow-changed', () => this.moduleThemeToShow = app.moduleThemeToShow);
 
     // this.nameSorted = 'notSorted';
     // this.clipboardText = 'Copier le lien';
@@ -130,22 +135,31 @@ class ThemeList extends LitElement {
     `
   }
 
-  openModifyThemePopup(themeName) {
-    let elem = createElem('modifytheme-popup');
-    elem.themeToModify = themeName;
+  openModifyModulePopup(moduleName, themeName) {
+    let elem = createElem('modifymodule-popup');
+    elem.moduleToModify = moduleName;
+    elem.oldThemeName = themeName;
   }
 
-  async checkThemeForDelete(themeName) {
-    const themeDoc = doc(app.db, "themes", themeName);
-    const q = query(collection(app.db, "modules"), where("theme", "==", themeDoc));
+  async deleteModuleFromTheme(moduleDoc, themeName) {
+    updateDoc(doc(app.db, "themes", themeName), {
+      modules: arrayRemove(moduleDoc)
+    });
+  }
+
+  async checkModuleForDelete(moduleName, themeName) {
+    const moduleDoc = doc(app.db, "modules", moduleName);
+    const q = query(collection(app.db, "files"), where("module", "==", moduleDoc));
     const querySnapshot = await getDocs(q);
     if (querySnapshot.size == 0) {
-      if (confirm('Etes-vous sûr de vouloir supprimer le thème ' + themeName + ' ?')) {
-        deleteDoc(themeDoc);
+      if (confirm('Etes-vous sûr de vouloir supprimer le module ' + moduleName + ' ?')) {
+        deleteDoc(moduleDoc);
+        this.deleteModuleFromTheme(moduleDoc, themeName);
+        updateModules();
         updateThemes();
       }
     } else {
-      alert('Le thème à supprimer contient des modules, veuillez les supprimer en premier.');
+      alert('Le module à supprimer contient des fichiers, veuillez les supprimer en premier.');
     }
   }
 
@@ -157,10 +171,13 @@ class ThemeList extends LitElement {
             <thead>
               <tr>
                 <th>
-                  Nom du thème
+                  Nom du module
                 </th>
                 <th>
-                  Modules
+                  Thème
+                </th>
+                <th>
+                  Fichiers
                 </th>
                 <th>
                   Modifier
@@ -171,20 +188,24 @@ class ThemeList extends LitElement {
               </tr>
             </thead>
             <tbody>
-              ${this.themesDisplayed
-                .map((themeDisplayed, idx) => html`
+              ${this.modulesDisplayed
+                .filter(moduleDisplayed => this.moduleThemeToShow == 'Tous les thèmes' || moduleDisplayed.theme.id == this.moduleThemeToShow)
+                .map((moduleDisplayed, idx) => html`
                 <tr style="background-color: ${idx % 2 ? '#ddd' : '#fff'}">
                   <td>
-                    ${themeDisplayed.id}
+                    ${moduleDisplayed.id}
                   </td>
                   <td>
-                    ${themeDisplayed.modules.map(module => module.id).join(', ')}
+                    ${moduleDisplayed.theme.id}
                   </td>
                   <td>
-                    <img class="table-item-image" src='images/modify.png' @click="${() => this.openModifyThemePopup(themeDisplayed.id)}" />
+                    ${moduleDisplayed.files.sort((file1, file2) => file1.id > file2.id ? 1 : -1).map(file => file.id).join(', ')}
                   </td>
                   <td>
-                    <img class="table-item-image" src='images/delete.png' @click="${() => this.checkThemeForDelete(themeDisplayed.id)}"/>
+                    <img class="table-item-image" src='images/modify.png' @click="${() => this.openModifyModulePopup(moduleDisplayed.id, moduleDisplayed.theme.id)}" />
+                  </td>
+                  <td>
+                    <img class="table-item-image" src='images/delete.png' @click="${() => this.checkModuleForDelete(moduleDisplayed.id, moduleDisplayed.theme.id)}"/>
                   </td>
                 </tr>
               `)}
@@ -196,4 +217,4 @@ class ThemeList extends LitElement {
   }
 
 }
-customElements.define('theme-list', ThemeList);
+customElements.define('module-list', ModuleList);

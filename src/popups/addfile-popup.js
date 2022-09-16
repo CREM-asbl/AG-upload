@@ -1,7 +1,8 @@
 import { ref, uploadBytes } from 'firebase/storage';
 import { css, html, LitElement } from 'lit';
 import { app } from '../Core/App';
-import { addFile } from '../Requests/fileRequest';
+import { addFile, updateFiles } from '../Requests/fileRequest';
+import { updateModules } from '../Requests/moduleRequest';
 import { TemplatePopup } from './template-popup';
 
 class AddFilePopup extends LitElement {
@@ -15,8 +16,8 @@ class AddFilePopup extends LitElement {
     super();
 
 
-    this.allModules = [{ id: 'aucune' }, ...app.modules];
-    window.addEventListener('modules-changed', () => this.allModules = [{ id: 'aucune' }, ...app.modules])
+    this.allModules = app.modules;
+    window.addEventListener('modules-changed', () => this.allModules = app.modules)
 
     window.addEventListener('close-popup', () => this.close());
   }
@@ -75,6 +76,8 @@ class AddFilePopup extends LitElement {
       await uploadBytes(storageRef, file);
 
       addFile(filename, this.moduleName, fileContentObject);
+      updateModules();
+      updateFiles();
     })
 
     this.close();

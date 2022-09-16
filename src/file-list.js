@@ -1,7 +1,10 @@
+import { arrayRemove, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { deleteObject, ref } from 'firebase/storage';
 import { css, html, LitElement } from 'lit';
 import { app } from './Core/App';
 import './Firebase/firebase-init';
-import { findAllFiles } from './Requests/fileRequest';
+import { updateFiles } from './Requests/fileRequest';
+import { updateModules } from './Requests/moduleRequest';
 
 class FileList extends LitElement {
   static get properties() {
@@ -16,11 +19,12 @@ class FileList extends LitElement {
 
   constructor() {
     super();
-    this.filesDisplayed = [];
+    this.filesDisplayed = app.files;
+    window.addEventListener('files-changed', () => this.filesDisplayed = app.files);
 
     this.fileEnvironmentToShow = app.fileEnvironmentToShow;
     window.addEventListener('fileEnvironmentToShow-changed', () => this.fileEnvironmentToShow = app.fileEnvironmentToShow);
-    this.fileModuleToShow = app.fileModuleToShow; 'Tous les modules';
+    this.fileModuleToShow = app.fileModuleToShow;
     window.addEventListener('fileModuleToShow-changed', () => this.fileModuleToShow = app.fileModuleToShow);
 
     this.nameSorted = 'notSorted';
@@ -31,7 +35,7 @@ class FileList extends LitElement {
   static get styles() {
     return css`
       #table-container {
-        height: calc(100% - 100px);
+        height: calc(100% - 150px);
         overflow: auto;
         margin: auto;
         // margin-top: 10px;
@@ -58,9 +62,7 @@ class FileList extends LitElement {
       }
 
       td, th {
-        border-collapse:collapse;
-        // border-right: solid 0.5px #333;
-        // border-left: solid 0.5px #333;
+        border-collapse: collapse;
         padding: 5px 20px;
       }
 
@@ -69,6 +71,7 @@ class FileList extends LitElement {
       }
 
       img.table-item-image {
+        cursor: pointer;
         height: 1em;
       }
 
@@ -133,35 +136,40 @@ class FileList extends LitElement {
     `
   }
 
-  async handleDisplayFile(findFunction) {
-    let filesInfos = await findFunction();
-
-    if (!filesInfos)
-      return;
-
-    this.filesDisplayed = [...filesInfos];
-  }
-
-  firstUpdated() {
-    this.handleDisplayFile(findAllFiles);
-  }
-
   copyToClipboard(event) {
     this.clipboardText = 'Lien copié !';
     navigator.clipboard.writeText(event.target.parentNode.parentNode.querySelector("a").href);
   }
 
-  sortByName() {
-    if (this.nameSorted != 'ascending') {
-      this.nameSorted = 'ascending';
-      this.filesDisplayed.sort((file1, file2) => {
-        return file1.id.localeCompare(file2.id)
-      });
-    } else {
-      this.nameSorted = 'descending';
-      this.filesDisplayed.sort((file1, file2) => {
-        return file2.id.localeCompare(file1.id)
-      });
+  // sortByName() {
+  //   if (this.nameSorted != 'ascending') {
+  //     this.nameSorted = 'ascending';
+  //     this.filesDisplayed.sort((file1, file2) => {
+  //       return file1.id.localeCompare(file2.id)
+  //     });
+  //   } else {
+  //     this.nameSorted = 'descending';
+  //     this.filesDisplayed.sort((file1, file2) => {
+  //       return file2.id.localeCompare(file1.id)
+  //     });
+  //   }
+  // }
+
+  async deleteFileFromModule(fileDoc, moduleName) {
+    updateDoc(doc(app.db, "modules", moduleName), {
+      files: arrayRemove(fileDoc)
+    });
+  }
+
+  async checkFileForDelete(fileName, moduleName) {
+    if (confirm('Etes-vous sûr de vouloir supprimer le fichier ' + fileName + ' ?')) {
+      const fileDoc = doc(app.db, "files", fileName);
+      deleteDoc(fileDoc);
+      this.deleteFileFromModule(fileDoc, moduleName);
+      const storageRef = ref(app.storage, fileName);
+      deleteObject(storageRef);
+      updateModules();
+      updateFiles();
     }
   }
 
@@ -172,9 +180,9 @@ class FileList extends LitElement {
           <table>
             <thead>
               <tr>
-                <th
-                  @click="${this.sortByName}"
-                  id="title" class="noselect sortable" sorted="${this.nameSorted}">
+                <th>
+                  <!-- @click="${this.sortByName}"
+                  id="title" class="noselect sortable" sorted="${this.nameSorted}"> -->
                   Nom du fichier
                 </th>
                 <th>
@@ -209,7 +217,7 @@ class FileList extends LitElement {
                     </a>
                     <div class="clipboardContainer">
                       <span class="clipboardTooltip">${this.clipboardText}</span>
-                      <img class="table-item-image" style="float: right; cursor: pointer; z-index: 1;" src="images/copyToClipboard.png" @click="${this.copyToClipboard}" @mouseout="${() => this.clipboardText = 'Copier le lien'}" />
+                      <img class="table-item-image" style="float: right; z-index: 1;" src="images/copyToClipboard.png" @click="${this.copyToClipboard}" @mouseout="${() => this.clipboardText = 'Copier le lien'}" />
                     </div>
                   </td>
                   <td>
@@ -222,7 +230,7 @@ class FileList extends LitElement {
                     <img class="table-item-image" src='images/modify.png' />
                   </td>
                   <td>
-                    <img class="table-item-image" src='images/delete.png' />
+                    <img class="table-item-image" src='images/delete.png' @click="${() => this.checkFileForDelete(fileDisplayed.id, fileDisplayed.module.id)}"/>
                   </td>
                 </tr>
               `)}

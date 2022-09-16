@@ -52,7 +52,8 @@ class ModifyThemePopup extends LitElement {
     const q = query(collection(app.db, "modules"), where("theme", "==", oldThemeDoc));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((moduleDoc) => {
-      updateDoc(doc(app.db, "modules", moduleDoc.id), {
+      moduleDoc = doc(app.db, "modules", moduleDoc.id);
+      updateDoc(moduleDoc, {
         theme: newThemeDoc,
       });
     });
