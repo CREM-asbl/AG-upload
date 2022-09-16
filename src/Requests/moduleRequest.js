@@ -1,5 +1,5 @@
 import { arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
-import { app } from "../Core/App";
+import { app, setState } from "../Core/App";
 import { handleMultipleDocumentRequest, handleSingleDocumentRequest } from "./generalRequest";
 
 export async function findModuleByName(name) {
@@ -25,4 +25,9 @@ export function addModule(moduleName, themeName) {
   updateDoc(themeDocRef, {
     modules: arrayUnion(newModuleDocRef),
   });
+}
+
+export async function updateModules() {
+  let modules = await findAllModules();
+  setState({ modules });
 }

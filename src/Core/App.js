@@ -9,6 +9,9 @@ export class App {
 
     this.modules = [];
     this.themes = [];
+
+    this.fileEnvironmentToShow = 'Tous les environnements';
+    this.fileModuleToShow = 'Tous les modules';
   }
 }
 
@@ -28,5 +31,11 @@ export const setState = (update) => {
   }
   if ('themes' in update) {
     window.dispatchEvent(new CustomEvent('themes-changed', { detail: app }));
+  }
+  if ('fileEnvironmentToShow' in update) {
+    window.dispatchEvent(new CustomEvent('fileEnvironmentToShow-changed', { detail: app }));
+  }
+  if ('fileModuleToShow' in update) {
+    window.dispatchEvent(new CustomEvent('fileModuleToShow-changed', { detail: app }));
   }
 };

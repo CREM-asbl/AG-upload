@@ -1,5 +1,5 @@
 import { collection, doc, getDocs, setDoc } from "firebase/firestore";
-import { app } from "../Core/App";
+import { app, setState } from "../Core/App";
 import { handleMultipleDocumentRequest } from "./generalRequest";
 
 export function addTheme(themeName) {
@@ -11,4 +11,9 @@ export function addTheme(themeName) {
 export async function findAllThemes() {
   let themesInfos = await handleMultipleDocumentRequest(() => getDocs(collection(app.db, "themes")));
   return themesInfos;
+}
+
+export async function updateThemes() {
+  let themes = await findAllThemes();
+  setState({ themes });
 }

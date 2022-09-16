@@ -1,8 +1,8 @@
 import { css, html, LitElement } from 'lit';
-import './Firebase/firebase-init';
-import './sign-in';
-import './header-elem';
 import { createElem } from './Core/general';
+import './Firebase/firebase-init';
+import './header-elem';
+import './sign-in';
 
 class HeaderElem extends LitElement {
   constructor() {
@@ -11,6 +11,9 @@ class HeaderElem extends LitElement {
 
   static get styles() {
     return css`
+      div {
+          height: 10%;
+      }
     `
   }
 

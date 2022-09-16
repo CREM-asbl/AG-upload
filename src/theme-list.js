@@ -1,31 +1,27 @@
+import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
 import { css, html, LitElement } from 'lit';
 import { app } from './Core/App';
+import { createElem } from './Core/general';
 import './Firebase/firebase-init';
-import { findAllFiles } from './Requests/fileRequest';
+import './popups/modifytheme-popup';
+import { updateThemes } from './Requests/themeRequest';
 
-class FileList extends LitElement {
+class THemeList extends LitElement {
   static get properties() {
     return {
-      filesDisplayed: { type: Array },
-      fileEnvironmentToShow: { type: String },
-      fileModuleToShow: { type: String },
-      nameSorted: { type: String },
-      clipboardText: { type: String },
+      themesDisplayed: { type: Array },
+      // nameSorted: { type: String },
+      // clipboardText: { type: String },
     };
   }
 
   constructor() {
     super();
-    this.filesDisplayed = [];
+    this.themesDisplayed = app.themes;
+    window.addEventListener('themes-changed', () => this.themesDisplayed = app.themes);
 
-    this.fileEnvironmentToShow = app.fileEnvironmentToShow;
-    window.addEventListener('fileEnvironmentToShow-changed', () => this.fileEnvironmentToShow = app.fileEnvironmentToShow);
-    this.fileModuleToShow = app.fileModuleToShow; 'Tous les modules';
-    window.addEventListener('fileModuleToShow-changed', () => this.fileModuleToShow = app.fileModuleToShow);
-
-    this.nameSorted = 'notSorted';
-
-    this.clipboardText = 'Copier le lien';
+    // this.nameSorted = 'notSorted';
+    // this.clipboardText = 'Copier le lien';
   }
 
   static get styles() {
@@ -133,35 +129,22 @@ class FileList extends LitElement {
     `
   }
 
-  async handleDisplayFile(findFunction) {
-    let filesInfos = await findFunction();
-
-    if (!filesInfos)
-      return;
-
-    this.filesDisplayed = [...filesInfos];
+  openModifyThemePopup(themeName) {
+    let elem = createElem('modifytheme-popup');
+    elem.themeToModify = themeName;
   }
 
-  firstUpdated() {
-    this.handleDisplayFile(findAllFiles);
-  }
-
-  copyToClipboard(event) {
-    this.clipboardText = 'Lien copié !';
-    navigator.clipboard.writeText(event.target.parentNode.parentNode.querySelector("a").href);
-  }
-
-  sortByName() {
-    if (this.nameSorted != 'ascending') {
-      this.nameSorted = 'ascending';
-      this.filesDisplayed.sort((file1, file2) => {
-        return file1.id.localeCompare(file2.id)
-      });
+  async checkThemeForDelete(themeName) {
+    const themeDoc = doc(app.db, "themes", themeName);
+    const q = query(collection(app.db, "modules"), where("theme", "==", themeDoc));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.size == 0) {
+      if (confirm('Etes-vous sûr de vouloir supprimer le thème ' + themeName + ' ?')) {
+        deleteDoc(themeDoc);
+        updateThemes();
+      }
     } else {
-      this.nameSorted = 'descending';
-      this.filesDisplayed.sort((file1, file2) => {
-        return file2.id.localeCompare(file1.id)
-      });
+      alert('Le thème à supprimer contient des modules, veuillez les supprimer en premier.');
     }
   }
 
@@ -172,19 +155,11 @@ class FileList extends LitElement {
           <table>
             <thead>
               <tr>
-                <th
-                  @click="${this.sortByName}"
-                  id="title" class="noselect sortable" sorted="${this.nameSorted}">
-                  Nom du fichier
+                <th>
+                  Nom du thème
                 </th>
                 <th>
-                  Lien
-                </th>
-                <th>
-                  Environnement
-                </th>
-                <th>
-                  Module
+                  Modules
                 </th>
                 <th>
                   Modifier
@@ -195,34 +170,20 @@ class FileList extends LitElement {
               </tr>
             </thead>
             <tbody>
-              ${this.filesDisplayed
-                .filter(fileDisplayed => this.fileEnvironmentToShow == 'Tous les environnements' || fileDisplayed.environment == this.fileEnvironmentToShow)
-                .filter(fileDisplayed => this.fileModuleToShow == 'Tous les modules' || fileDisplayed.module.id == this.fileModuleToShow)
-                .map((fileDisplayed, idx) => html`
+              ${this.themesDisplayed
+                .map((themeDisplayed, idx) => html`
                 <tr style="background-color: ${idx % 2 ? '#ddd' : '#fff'}">
                   <td>
-                    ${fileDisplayed.id}
+                    ${themeDisplayed.id}
                   </td>
                   <td>
-                    <a target="_blank" href="${'https://ag.crem.be/?activityName=' + fileDisplayed.id}">
-                      ${'ag.crem.be/?activityName=' + fileDisplayed.id}
-                    </a>
-                    <div class="clipboardContainer">
-                      <span class="clipboardTooltip">${this.clipboardText}</span>
-                      <img class="table-item-image" style="float: right; cursor: pointer; z-index: 1;" src="images/copyToClipboard.png" @click="${this.copyToClipboard}" @mouseout="${() => this.clipboardText = 'Copier le lien'}" />
-                    </div>
+                    ${themeDisplayed.modules.map(module => module.id).join(', ')}
                   </td>
                   <td>
-                    ${fileDisplayed.environment}
+                    <img class="table-item-image" src='images/modify.png' @click="${() => this.openModifyThemePopup(themeDisplayed.id)}" />
                   </td>
                   <td>
-                    ${fileDisplayed.module.id}
-                  </td>
-                  <td>
-                    <img class="table-item-image" src='images/modify.png' />
-                  </td>
-                  <td>
-                    <img class="table-item-image" src='images/delete.png' />
+                    <img class="table-item-image" src='images/delete.png' @click="${() => this.checkThemeForDelete(themeDisplayed.id)}"/>
                   </td>
                 </tr>
               `)}
@@ -234,4 +195,4 @@ class FileList extends LitElement {
   }
 
 }
-customElements.define('file-list', FileList);
+customElements.define('theme-list', THemeList);

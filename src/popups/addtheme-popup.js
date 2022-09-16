@@ -1,5 +1,5 @@
 import { css, html, LitElement } from 'lit';
-import { addTheme } from '../Requests/themeRequest';
+import { addTheme, updateThemes } from '../Requests/themeRequest';
 import { TemplatePopup } from './template-popup';
 
 class AddThemePopup extends LitElement {
@@ -43,9 +43,10 @@ class AddThemePopup extends LitElement {
   async sendTheme() {
     let themeName = this.shadowRoot.querySelector('#theme').value;
 
-    if (themeName && themeName != "")
-      addTheme(themeName)
-    else {
+    if (themeName && themeName != "") {
+      addTheme(themeName);
+      updateThemes();
+    } else {
       alert("remplir le champ nom du thème");
       return;
     }

@@ -21,6 +21,13 @@ class SignIn extends LitElement {
     return [
       css`
         :host {
+          -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+              -moz-user-select: none; /* Old versions of Firefox */
+                -ms-user-select: none; /* Internet Explorer/Edge */
+                    user-select: none; /* Non-prefixed version, currently
+                                          supported by Chrome, Edge, Opera and Firefox */
         }
 
         .background {
@@ -144,7 +151,7 @@ class SignIn extends LitElement {
           </h1>
           <label class="email-label">
             <input @focus="${this.focuser}" @focusout="${this.focuser}" @change="${this.changeEmail}" type="text" required>
-            <span>email</span>
+            <span @click="${this.focuser}">email</span>
           </label>
           <span class="error">
             ${this.error == 'invalid-email' ? 'email invalide' : ''}
@@ -168,8 +175,9 @@ class SignIn extends LitElement {
   }
 
   focuser(e) {
-    if (e.type == "focus") {
+    if (e.type == "focus" || e.type == "click") {
       e.target.parentNode.classList.add('focused');
+      e.target.parentNode.focus();
     } else {
       e.target.parentNode.classList.remove('focused');
       e.target.parentNode.classList.remove('error');
