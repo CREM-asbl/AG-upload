@@ -142,6 +142,8 @@ class AguApp extends LitElement {
                 Ajouter un module
               </button>
 
+              <br>
+
               Filtrer par
 
               <br>

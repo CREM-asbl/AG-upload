@@ -2,7 +2,9 @@ import { arrayRemove, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { deleteObject, ref } from 'firebase/storage';
 import { css, html, LitElement } from 'lit';
 import { app } from './Core/App';
+import { createElem } from './Core/general';
 import './Firebase/firebase-init';
+import './popups/modifyfile-popup';
 import { updateFiles } from './Requests/fileRequest';
 import { updateModules } from './Requests/moduleRequest';
 
@@ -141,6 +143,12 @@ class FileList extends LitElement {
     navigator.clipboard.writeText(event.target.parentNode.parentNode.querySelector("a").href);
   }
 
+  openModifyFilePopup(fileName, moduleName) {
+    let elem = createElem('modifyfile-popup');
+    elem.fileToModify = fileName;
+    elem.oldModuleName = moduleName;
+  }
+
   // sortByName() {
   //   if (this.nameSorted != 'ascending') {
   //     this.nameSorted = 'ascending';
@@ -227,7 +235,7 @@ class FileList extends LitElement {
                     ${fileDisplayed.module.id}
                   </td>
                   <td>
-                    <img class="table-item-image" src='images/modify.png' />
+                    <img class="table-item-image" src='images/modify.png' @click="${() => this.openModifyFilePopup(fileDisplayed.id, fileDisplayed.module.id)}"/>
                   </td>
                   <td>
                     <img class="table-item-image" src='images/delete.png' @click="${() => this.checkFileForDelete(fileDisplayed.id, fileDisplayed.module.id)}"/>

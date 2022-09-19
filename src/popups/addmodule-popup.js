@@ -53,7 +53,7 @@ class AddModulePopup extends LitElement {
           </select>
         </div>
         <div slot="footer">
-          <button id="focus" @click="${() => this.sendModule()}">Envoyer</button>
+          <button id="focus" @click="${() => this.sendModule()}">Ajouter</button>
         </div>
       </template-popup>
     `;

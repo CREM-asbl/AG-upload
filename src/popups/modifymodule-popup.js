@@ -56,7 +56,7 @@ class ModifyModulePopup extends LitElement {
           </fieldset>
         </div>
         <div slot="footer">
-          <button id="focus" @click="${() => this.modifyModule()}">Envoyer</button>
+          <button id="focus" @click="${() => this.modifyModule()}">Modifier</button>
         </div>
       </template-popup>
     `;

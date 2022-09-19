@@ -7,8 +7,8 @@ export async function findAllFiles() {
   return filesInfos;
 }
 
-export function addFile(file, moduleName, fileContentObject) {
-  let newFileDocRef = doc(app.db, 'files', file);
+export function addFile(filename, moduleName, fileContentObject) {
+  let newFileDocRef = doc(app.db, 'files', filename);
   let moduleDocRef = doc(app.db, 'modules', moduleName);
 
   setDoc(newFileDocRef, {

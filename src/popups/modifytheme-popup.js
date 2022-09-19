@@ -42,7 +42,7 @@ class ModifyThemePopup extends LitElement {
           </fieldset>
         </div>
         <div slot="footer">
-          <button id="focus" @click="${() => this.modifyTheme()}">Envoyer</button>
+          <button id="focus" @click="${() => this.modifyTheme()}">Modifier</button>
         </div>
       </template-popup>
     `;

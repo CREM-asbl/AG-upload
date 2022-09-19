@@ -34,7 +34,7 @@ class AddThemePopup extends LitElement {
           <input type="text" id="theme" name="theme" />
         </div>
         <div slot="footer">
-          <button id="focus" @click="${() => this.sendTheme()}">Envoyer</button>
+          <button id="focus" @click="${() => this.sendTheme()}">Ajouter</button>
         </div>
       </template-popup>
     `;
