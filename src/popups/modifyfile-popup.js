@@ -46,7 +46,7 @@ class ModifyFilePopup extends LitElement {
   render() {
     return html`
       <template-popup>
-        <h2 slot="title">Modifier un module</h2>
+        <h2 slot="title">Modifier un fichier</h2>
         <div id="" slot="body">
           <fieldset>
             <legend>Nom du fichier</legend>
