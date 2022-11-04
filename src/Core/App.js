@@ -44,7 +44,9 @@ export const setState = (update) => {
     window.dispatchEvent(new CustomEvent('fileModuleToShow-changed', { detail: app }));
   }
   if ('moduleThemeToShow' in update) {
-    console.log(app);
     window.dispatchEvent(new CustomEvent('moduleThemeToShow-changed', { detail: app }));
+  }
+  if ('user' in update) {
+    window.dispatchEvent(new CustomEvent('user-changed', { detail: app }));
   }
 };

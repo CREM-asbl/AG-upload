@@ -3,7 +3,7 @@ import { app, setState } from './Core/App';
 import { createElem } from './Core/general';
 import './file-list';
 import './Firebase/firebase-init';
-import './header-elem';
+import { signOutUser } from './Firebase/firebase-init';
 import './module-list';
 import './popups/addfile-popup';
 import './popups/addmodule-popup';
@@ -19,6 +19,7 @@ class AguApp extends LitElement {
     return {
       allModules: { type: Array },
       elementTypeToShow: { type: String },
+      user: { type: Object },
     };
   }
 
@@ -34,6 +35,9 @@ class AguApp extends LitElement {
     this.allEnvironments = ['Tous les environnements', 'Grandeurs', 'Tangram', 'Cubes', 'Geometrie'];
 
     this.elementTypeToShow = null;
+
+    this.user = app.user;
+    window.addEventListener('user-changed', () => this.user = app.user);
   }
 
   static get styles() {
@@ -68,6 +72,15 @@ class AguApp extends LitElement {
 
       button {
         cursor: pointer;
+      }
+
+      a {
+        color: blue;
+        cursor: pointer;
+      }
+
+      a:visited {
+        color: blue;
       }
     `
   }
@@ -123,7 +136,7 @@ class AguApp extends LitElement {
     return [
       html`
         <div class="not-table-elements">
-          <a @click="${() => createElem('sign-in')}">se connecter</a>
+          ${this.user ? html`<a @click="${() => this.signOut()}">Se déconnecter</a> (${this.user.email})` : html`<a @click="${() => createElem('sign-in')}">Se connecter</a>`}
 
           <div class="element-choice-container">
             <fieldset class="element-choice ${this.elementTypeToShow == 'themes' ? 'element-choice-selected' : ''}">
@@ -179,6 +192,10 @@ class AguApp extends LitElement {
       `,
       this.showElement()
     ];
+  }
+
+  signOut() {
+    signOutUser();
   }
 }
 customElements.define('agu-app', AguApp);

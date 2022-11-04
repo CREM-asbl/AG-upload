@@ -5,6 +5,11 @@ class SignIn extends LitElement {
   constructor() {
     super();
     this.error = '';
+
+    window.addEventListener('keydown', (e) => {
+      if (e.keyCode == 27)
+        this.close();
+    });
   }
 
   static get properties() {
@@ -22,12 +27,16 @@ class SignIn extends LitElement {
       css`
         :host {
           -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none; /* Safari */
-            -khtml-user-select: none; /* Konqueror HTML */
-              -moz-user-select: none; /* Old versions of Firefox */
-                -ms-user-select: none; /* Internet Explorer/Edge */
-                    user-select: none; /* Non-prefixed version, currently
-                                          supported by Chrome, Edge, Opera and Firefox */
+          -webkit-user-select: none; /* Safari */
+          -khtml-user-select: none; /* Konqueror HTML */
+          -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+        }
+
+        @keyframes popup-opactiy {
+          from {opacity: 0.5;}
+          to {opacity: 1;}
         }
 
         .background {
@@ -38,6 +47,11 @@ class SignIn extends LitElement {
           right: 0;
           bottom: 0;
           z-index: 100;
+
+          opacity: 1;
+          animation-name: popup-opactiy;
+          animation-duration: 0.1s;
+          transition: opacity 0.1s;
         }
 
         form {
@@ -160,7 +174,7 @@ class SignIn extends LitElement {
           </span>
           <label class="password-label">
             <input @focus="${this.focuser}" @focusout="${this.focuser}" @change="${this.changePassword}" type="${this.isPasswordShown ? 'text' : 'password'}" required>
-            <span>mot de passe</span>
+            <span @click="${this.focuser}">mot de passe</span>
             <img @click="${this.changePasswordVisibility}" src="${this.isPasswordShown ? 'images/eye.png' : 'images/eye cross.png'}"/>
           </label>
 
@@ -246,10 +260,16 @@ class SignIn extends LitElement {
 
   close(e) {
     if (e && e.type == 'click' && e.target.classList[0] == 'background')
-      this.remove();
+      this.closeAnimation();
     else if (e)
       return;
-    this.remove();
+    else
+      this.closeAnimation();
+  }
+
+  closeAnimation() {
+    this.shadowRoot.querySelector('div').style.opacity = 0;
+    setTimeout(() => this.remove(), 100);
   }
 }
 customElements.define('sign-in', SignIn);

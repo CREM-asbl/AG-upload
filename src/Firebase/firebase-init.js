@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { setState } from '../Core/App';
@@ -11,7 +11,7 @@ const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 setState({ db });
 const storage = getStorage(firebaseApp);
-setState({ storage })
+setState({ storage });
 
 export async function authenticateUser(email, password) {
   try {
@@ -22,4 +22,16 @@ export async function authenticateUser(email, password) {
   } catch (e) {
     return e;
   }
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    setState({ user });
+  } else {
+    setState({ user: null });
+  }
+});
+
+export async function signOutUser() {
+  await signOut(auth);
 }
