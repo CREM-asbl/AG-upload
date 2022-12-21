@@ -132,13 +132,13 @@ class ModifyFilePopup extends LitElement {
       const docData = docSnap.data();
       docData.version = fileContentObject.appVersion;
       docData.environment = fileContentObject.envName;
+      await deleteDoc(oldFileDoc);
       await setDoc(newFileDoc, docData);
-      deleteDoc(oldFileDoc);
 
       // upload new and delete old file
       const storageRef = ref(app.storage, filename);
+      await deleteObject(ref(app.storage, this.fileToModify));
       await uploadBytes(storageRef, this.fileSelected);
-      deleteObject(ref(app.storage, this.fileToModify));
 
       mustUpdateUI = true;
     }
