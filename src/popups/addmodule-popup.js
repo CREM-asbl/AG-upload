@@ -61,6 +61,9 @@ class AddModulePopup extends LitElement {
 
   async sendModule() {
     if (this.moduleName && this.moduleName != "") {
+      if (!this.themeName) {
+        this.themeName = this.allThemes[0].id;
+      }
       addModule(this.moduleName, this.themeName);
       updateModules();
       updateThemes();

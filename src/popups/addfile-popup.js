@@ -67,6 +67,9 @@ class AddFilePopup extends LitElement {
   }
 
   async sendFile() {
+    if (!this.moduleName) {
+      this.moduleName = this.allModules[0].id;
+    }
     [...this.filesSelected].forEach(async file => {
       let filename = file.name;
       let fileContent = await file.text();

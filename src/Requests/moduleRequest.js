@@ -1,6 +1,6 @@
-import { arrayUnion, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { app, setState } from "../Core/App";
-import { handleMultipleDocumentRequest, handleSingleDocumentRequest } from "./generalRequest";
+import { handleMultipleDocumentRequest } from "./generalRequest";
 
 export async function findAllModules() {
   let modulesInfos = await handleMultipleDocumentRequest(() => getDocs(collection(app.db, "modules")));
